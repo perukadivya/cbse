@@ -7,9 +7,10 @@ import { ChevronRight, Search, BookOpen, X } from 'lucide-react';
 
 interface SubjectSelectorProps {
     onSelectChapter: (subject: Subject, book: SubjectBook, chapter: Chapter) => void;
+    lang?: string;
 }
 
-export default function SubjectSelector({ onSelectChapter }: SubjectSelectorProps) {
+export default function SubjectSelector({ onSelectChapter, lang = 'en' }: SubjectSelectorProps) {
     const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -35,7 +36,7 @@ export default function SubjectSelector({ onSelectChapter }: SubjectSelectorProp
                         exit={{ opacity: 0, y: -10 }}
                     >
                         <h2 className="text-xl font-bold text-gray-800 mb-6 text-center">
-                            Choose your Subject
+                            {lang === 'en' ? 'Choose your Subject' : 'మీ విషయాన్ని ఎంచుకోండి'}
                         </h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {subjects.map((subject, idx) => (
@@ -85,7 +86,7 @@ export default function SubjectSelector({ onSelectChapter }: SubjectSelectorProp
                             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                             <input
                                 type="text"
-                                placeholder="Search chapters or topics..."
+                                placeholder={lang === 'en' ? 'Search chapters or topics...' : 'అధ్యాయాలు లేదా అంశాలను అన్వేషించండి...'}
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none transition-all bg-white shadow-sm"

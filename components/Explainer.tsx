@@ -11,11 +11,12 @@ interface ExplainerProps {
     subject?: string;
     chapter?: string;
     book?: string;
+    lang?: string;
 }
 
 type Mode = 'explain' | 'revision' | 'important';
 
-export default function Explainer({ subject, chapter, book }: ExplainerProps) {
+export default function Explainer({ subject, chapter, book, lang = 'en' }: ExplainerProps) {
     const [topic, setTopic] = useState(chapter || '');
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
@@ -32,11 +33,11 @@ export default function Explainer({ subject, chapter, book }: ExplainerProps) {
         try {
             let text = '';
             if (mode === 'explain') {
-                text = await explainTopic(searchTopic, simplify, subject, chapter, book);
+                text = await explainTopic(searchTopic, simplify, subject, chapter, book, lang);
             } else if (mode === 'revision') {
-                text = await generateRevisionNotes(searchTopic, subject || 'General', book);
+                text = await generateRevisionNotes(searchTopic, subject || 'General', book, lang);
             } else {
-                text = await generateImportantQuestions(searchTopic, subject || 'General', book);
+                text = await generateImportantQuestions(searchTopic, subject || 'General', book, lang);
             }
             setContent(text || 'No content generated.');
         } catch (error) {

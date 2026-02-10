@@ -3,12 +3,20 @@
 import { generateText } from 'ai';
 import { geminiModel } from '@/lib/ai';
 
+function getLangInstruction(lang: string): string {
+    if (lang === 'te') {
+        return '\n\nIMPORTANT: Respond ENTIRELY in Telugu (తెలుగు) script. Use Telugu language for all explanations, headings, and content. Keep technical terms in English within parentheses where helpful, e.g., "విద్యుత్ ప్రవాహం (Electric Current)".';
+    }
+    return '';
+}
+
 export async function explainTopic(
     topic: string,
     simplify: boolean = false,
     subject?: string,
     chapter?: string,
-    book?: string
+    book?: string,
+    lang: string = 'en'
 ) {
     const ncertContext = subject && chapter
         ? `You are explaining from the NCERT ${book || subject} textbook, Chapter: "${chapter}".`
@@ -36,7 +44,7 @@ A relatable example students can visualize.
 - Important points frequently asked in CBSE board exams
 - Common mistakes to avoid
 
-Format using Markdown with proper headings and bullet points.`;
+Format using Markdown with proper headings and bullet points.${getLangInstruction(lang)}`;
 
     const { text } = await generateText({
         model: geminiModel,
@@ -49,10 +57,15 @@ Format using Markdown with proper headings and bullet points.`;
 export async function generateQuiz(
     topic: string,
     subject?: string,
-    chapter?: string
+    chapter?: string,
+    lang: string = 'en'
 ) {
     const ncertContext = subject && chapter
         ? `The questions should be based on NCERT ${subject} textbook, Chapter: "${chapter}".`
+        : '';
+
+    const langNote = lang === 'te'
+        ? '\nIMPORTANT: Write all questions, options, answers, and explanations in Telugu (తెలుగు). Keep technical/scientific terms in English within parentheses where helpful.'
         : '';
 
     const prompt = `Generate a 5-question multiple choice quiz for CBSE Grade 10 students on the topic "${topic}".
@@ -65,7 +78,7 @@ Return ONLY a JSON array of objects. Each object should have:
 - answer (string, the correct option text)
 - explanation (string, why this is correct, referencing NCERT content where possible)
 
-Do not include markdown code blocks (like \`\`\`json). Just the raw JSON.`;
+Do not include markdown code blocks (like \`\`\`json). Just the raw JSON.${langNote}`;
 
     const { text } = await generateText({
         model: geminiModel,
@@ -84,7 +97,8 @@ Do not include markdown code blocks (like \`\`\`json). Just the raw JSON.`;
 export async function generateRevisionNotes(
     chapter: string,
     subject: string,
-    book?: string
+    book?: string,
+    lang: string = 'en'
 ) {
     const prompt = `Create concise revision notes for CBSE Grade 10 students.
 Subject: ${subject}
@@ -111,7 +125,7 @@ The notes should be based on the NCERT textbook and follow this format:
 ### One-Liner Recap
 - Ultra-short one-line summary for last-minute revision
 
-Format using Markdown with proper headings and bullet points.`;
+Format using Markdown with proper headings and bullet points.${getLangInstruction(lang)}`;
 
     const { text } = await generateText({
         model: geminiModel,
@@ -124,7 +138,8 @@ Format using Markdown with proper headings and bullet points.`;
 export async function generateImportantQuestions(
     chapter: string,
     subject: string,
-    book?: string
+    book?: string,
+    lang: string = 'en'
 ) {
     const prompt = `Generate the most important questions for CBSE Grade 10 board exam preparation.
 Subject: ${subject}
@@ -148,7 +163,7 @@ Based on NCERT content and previous year papers, provide:
 - 2 questions with comprehensive answers
 
 For each question, provide a model answer that follows the CBSE marking scheme.
-Format using Markdown.`;
+Format using Markdown.${getLangInstruction(lang)}`;
 
     const { text } = await generateText({
         model: geminiModel,

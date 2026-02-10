@@ -17,9 +17,10 @@ interface Question {
 interface QuizProps {
     subject?: string;
     chapter?: string;
+    lang?: string;
 }
 
-export default function Quiz({ subject, chapter }: QuizProps) {
+export default function Quiz({ subject, chapter, lang = 'en' }: QuizProps) {
     const [topic, setTopic] = useState(chapter || '');
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(false);
@@ -39,7 +40,7 @@ export default function Quiz({ subject, chapter }: QuizProps) {
         setSelectedOption(null);
 
         try {
-            const data = await generateQuiz(searchTopic, subject, chapter);
+            const data = await generateQuiz(searchTopic, subject, chapter, lang);
             if (Array.isArray(data) && data.length > 0) {
                 setQuestions(data);
             } else {
