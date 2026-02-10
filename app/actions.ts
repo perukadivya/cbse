@@ -3,6 +3,21 @@
 import { generateText } from 'ai';
 import { geminiModel } from '@/lib/ai';
 
+const FORMULA_INSTRUCTION = `
+
+CRITICAL FORMATTING RULES:
+- NEVER use LaTeX notation like $\\text{...}$, \\frac{}, or any $ delimiters.
+- For chemical formulas, use Unicode subscripts: H₂O, CO₂, Fe₂O₃, H₂SO₄, NaOH, CaCO₃, CH₄, C₆H₁₂O₆
+  Use these Unicode subscript characters: ₀₁₂₃₄₅₆₇₈₉ and superscripts: ⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻
+- For math formulas, write them in plain readable text:
+  Instead of $x^2 + y^2 = r^2$, write: x² + y² = r²
+  Instead of $\\frac{a}{b}$, write: a/b
+  Instead of $\\sqrt{x}$, write: √x
+  Instead of $\\pi r^2$, write: πr²
+  Instead of $\\theta$, write: θ
+- For equations, use → for reactions: 2H₂ + O₂ → 2H₂O
+- Use ≠, ≤, ≥, ±, ×, ÷ instead of LaTeX equivalents.`;
+
 function getLangInstruction(lang: string): string {
     if (lang === 'te') {
         return '\n\nIMPORTANT: Respond ENTIRELY in Telugu (తెలుగు) script. Use Telugu language for all explanations, headings, and content. Keep technical terms in English within parentheses where helpful, e.g., "విద్యుత్ ప్రవాహం (Electric Current)".';
@@ -44,7 +59,7 @@ A relatable example students can visualize.
 - Important points frequently asked in CBSE board exams
 - Common mistakes to avoid
 
-Format using Markdown with proper headings and bullet points.${getLangInstruction(lang)}`;
+Format using Markdown with proper headings and bullet points.${FORMULA_INSTRUCTION}${getLangInstruction(lang)}`;
 
     const { text } = await generateText({
         model: geminiModel,
@@ -78,7 +93,7 @@ Return ONLY a JSON array of objects. Each object should have:
 - answer (string, the correct option text)
 - explanation (string, why this is correct, referencing NCERT content where possible)
 
-Do not include markdown code blocks (like \`\`\`json). Just the raw JSON.${langNote}`;
+Do not include markdown code blocks (like \`\`\`json). Just the raw JSON.${FORMULA_INSTRUCTION}${langNote}`;
 
     const { text } = await generateText({
         model: geminiModel,
@@ -125,7 +140,7 @@ The notes should be based on the NCERT textbook and follow this format:
 ### One-Liner Recap
 - Ultra-short one-line summary for last-minute revision
 
-Format using Markdown with proper headings and bullet points.${getLangInstruction(lang)}`;
+Format using Markdown with proper headings and bullet points.${FORMULA_INSTRUCTION}${getLangInstruction(lang)}`;
 
     const { text } = await generateText({
         model: geminiModel,
@@ -163,7 +178,7 @@ Based on NCERT content and previous year papers, provide:
 - 2 questions with comprehensive answers
 
 For each question, provide a model answer that follows the CBSE marking scheme.
-Format using Markdown.${getLangInstruction(lang)}`;
+Format using Markdown.${FORMULA_INSTRUCTION}${getLangInstruction(lang)}`;
 
     const { text } = await generateText({
         model: geminiModel,
