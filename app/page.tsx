@@ -1,64 +1,133 @@
 'use client';
 
 import { useState } from 'react';
+import SubjectSelector from '@/components/SubjectSelector';
 import Explainer from '@/components/Explainer';
 import Quiz from '@/components/Quiz';
+import { Subject, SubjectBook, Chapter } from '@/lib/ncert-data';
 import { motion } from 'framer-motion';
+import { ArrowLeft, BookOpen, BrainCircuit, GraduationCap } from 'lucide-react';
+
+type View = 'subjects' | 'learn' | 'quiz';
+
+interface SelectedContext {
+  subject: Subject;
+  book: SubjectBook;
+  chapter: Chapter;
+}
 
 export default function Home() {
-  const [activeTab, setActiveTab] = useState<'learn' | 'quiz'>('learn');
+  const [view, setView] = useState<View>('subjects');
+  const [context, setContext] = useState<SelectedContext | null>(null);
+  const [actionAfterSelect, setActionAfterSelect] = useState<'learn' | 'quiz'>('learn');
+
+  const handleSelectChapter = (subject: Subject, book: SubjectBook, chapter: Chapter) => {
+    setContext({ subject, book, chapter });
+    setView(actionAfterSelect);
+  };
+
+  const goHome = () => {
+    setView('subjects');
+    setContext(null);
+  };
 
   return (
-    <main className="min-h-screen bg-slate-50 relative overflow-hidden">
-      {/* Background Decorative Elemnts */}
-      <div className="absolute top-0 left-0 w-full h-64 bg-gradient-to-br from-indigo-600 to-purple-700 rounded-b-[3rem] shadow-xl z-0" />
+    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 relative overflow-hidden">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-0 left-0 w-full h-72 bg-gradient-to-br from-indigo-600 via-purple-600 to-violet-700 rounded-b-[4rem] shadow-2xl z-0" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+      <div className="absolute bottom-0 left-0 w-72 h-72 bg-indigo-400/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
       <div className="relative z-10 container mx-auto px-4 py-8">
-        <header className="text-center text-white mb-12">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-2 tracking-tight">
-            CBSE Ace <span className="text-yellow-300">Grade 10</span>
-          </h1>
-          <p className="text-indigo-100 text-lg md:text-xl font-light">
-            Your personal AI Tutor for rapid revision.
-          </p>
+        {/* Header */}
+        <header className="text-center text-white mb-10">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="flex items-center justify-center gap-3 mb-3">
+              <GraduationCap className="w-10 h-10 text-yellow-300" />
+              <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+                CBSE Ace <span className="text-yellow-300">Grade 10</span>
+              </h1>
+            </div>
+            <p className="text-indigo-100 text-lg md:text-xl font-light">
+              Your AI-powered NCERT study companion
+            </p>
+          </motion.div>
         </header>
 
         <div className="max-w-4xl mx-auto">
-          {/* Navigation Tabs */}
-          <div className="flex justify-center mb-8 bg-white/20 backdrop-blur-md p-1 rounded-full w-fit mx-auto shadow-lg">
-            <button
-              onClick={() => setActiveTab('learn')}
-              className={`px-8 py-2 rounded-full font-semibold transition-all duration-300 ${activeTab === 'learn'
-                  ? 'bg-white text-indigo-600 shadow-md transform scale-105'
-                  : 'text-indigo-100 hover:bg-white/10'
-                }`}
+          {/* Navigation */}
+          {view === 'subjects' ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
             >
-              Learn Concepts
-            </button>
-            <button
-              onClick={() => setActiveTab('quiz')}
-              className={`px-8 py-2 rounded-full font-semibold transition-all duration-300 ${activeTab === 'quiz'
-                  ? 'bg-white text-purple-600 shadow-md transform scale-105'
-                  : 'text-purple-100 hover:bg-white/10'
-                }`}
-            >
-              Take Quiz
-            </button>
-          </div>
+              {/* Quick Action Buttons */}
+              <div className="flex justify-center gap-4 mb-8">
+                <button
+                  onClick={() => setActionAfterSelect('learn')}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 shadow-md ${actionAfterSelect === 'learn'
+                      ? 'bg-white text-indigo-600 shadow-lg scale-105'
+                      : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
+                    }`}
+                >
+                  <BookOpen className="w-5 h-5" />
+                  Study
+                </button>
+                <button
+                  onClick={() => setActionAfterSelect('quiz')}
+                  className={`flex items-center gap-2 px-6 py-3 rounded-2xl font-semibold transition-all duration-300 shadow-md ${actionAfterSelect === 'quiz'
+                      ? 'bg-white text-purple-600 shadow-lg scale-105'
+                      : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
+                    }`}
+                >
+                  <BrainCircuit className="w-5 h-5" />
+                  Quiz
+                </button>
+              </div>
 
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, x: activeTab === 'learn' ? -20 : 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: activeTab === 'learn' ? 20 : -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            {activeTab === 'learn' ? <Explainer /> : <Quiz />}
-          </motion.div>
+              {/* Subject Grid */}
+              <div className="bg-white/80 backdrop-blur-md rounded-3xl p-6 shadow-xl border border-white/50">
+                <SubjectSelector onSelectChapter={handleSelectChapter} />
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+            >
+              {/* Back Button */}
+              <button
+                onClick={goHome}
+                className="flex items-center gap-2 text-white/80 hover:text-white mb-6 font-medium transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to Subjects
+              </button>
+
+              {/* Content Area */}
+              {view === 'learn' && (
+                <Explainer
+                  subject={context?.subject.name}
+                  chapter={context?.chapter.name}
+                  book={context?.book.bookName}
+                />
+              )}
+              {view === 'quiz' && (
+                <Quiz
+                  subject={context?.subject.name}
+                  chapter={context?.chapter.name}
+                />
+              )}
+            </motion.div>
+          )}
         </div>
 
-        <footer className="mt-20 text-center text-gray-500 text-sm">
-          <p>Powered by Gemini & Next.js • Built for Success</p>
+        <footer className="mt-20 text-center text-gray-400 text-sm">
+          <p>Powered by Gemini & NCERT • Built for Board Exam Success 🎯</p>
         </footer>
       </div>
     </main>
